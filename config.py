@@ -4,9 +4,9 @@ IMAGE_SIZE = 256
 
 BATCH_SIZE = 8
 
-LEARNING_RATE = 0.001
+LEARNING_RATE = 1e-4
 
-EPOCHS = 20
+EPOCHS = 50
 
 TRAIN_HAZY_DIR = "data/train/hazy"
 TRAIN_CLEAR_DIR = "data/train/clear"

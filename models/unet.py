@@ -47,7 +47,10 @@ class UNet(nn.Module):
         self.up1 = nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2)
         self.dec1 = DoubleConv(128, 64)
 
-        self.output = nn.Conv2d(64, 3, kernel_size=1)
+        self.output = nn.Sequential(
+            nn.Conv2d(64, 3, kernel_size=1),
+            nn.Sigmoid()
+        )
 
     def forward(self, x):
 

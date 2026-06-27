@@ -30,10 +30,11 @@ def test(image_path, output_path):
     image = image.unsqueeze(0).to(device)
 
     with torch.no_grad():
-
         output = model(image)
 
     output = output.squeeze(0).cpu()
+
+    output = torch.clamp(output, 0, 1)
 
     output = transforms.ToPILImage()(output)
 
@@ -45,6 +46,6 @@ def test(image_path, output_path):
 if __name__ == "__main__":
 
     test(
-        "sample_hazy.png",
+        "data/train/hazy/2_1_0.99082.png",
         "outputs/dehazed_image.png"
     )
