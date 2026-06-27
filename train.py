@@ -24,7 +24,7 @@ def train():
     )
 
     model = UNet()
-    model.to(device)
+    model.to(device)    
 
     criterion = nn.MSELoss()
 

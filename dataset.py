@@ -14,7 +14,11 @@ class DehazeDataset(Dataset):
         self.hazy_dir = hazy_dir
         self.clear_dir = clear_dir
 
-        self.images = os.listdir(hazy_dir)
+        self.images = sorted(
+            image
+            for image in os.listdir(hazy_dir)
+            if image.lower().endswith((".png", ".jpg", ".jpeg"))
+        )
 
         self.transform = transforms.Compose([
             transforms.Resize((IMAGE_SIZE, IMAGE_SIZE)),
@@ -26,11 +30,12 @@ class DehazeDataset(Dataset):
         return len(self.images)
 
     def __getitem__(self, index):
-
         image_name = self.images[index]
 
+        clear_name = image_name.split("_")[0] + ".png"
+
         hazy_path = os.path.join(self.hazy_dir, image_name)
-        clear_path = os.path.join(self.clear_dir, image_name)
+        clear_path = os.path.join(self.clear_dir, clear_name)
 
         hazy_image = Image.open(hazy_path).convert("RGB")
         clear_image = Image.open(clear_path).convert("RGB")
