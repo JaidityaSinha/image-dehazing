@@ -8,6 +8,7 @@ LEARNING_RATE = 1e-4
 
 EPOCHS = 50
 
+
 TRAIN_HAZY_DIR = "data/train/hazy"
 TRAIN_CLEAR_DIR = "data/train/clear"
 
