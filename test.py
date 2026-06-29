@@ -46,6 +46,6 @@ def test(image_path, output_path):
 if __name__ == "__main__":
 
     test(
-        "data/train/hazy/2_1_0.99082.png",
+        "data/train/hazy/1_1_0.90179.png",
         "outputs/dehazed_image.png"
     )
