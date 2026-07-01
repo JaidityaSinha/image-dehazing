@@ -2,20 +2,18 @@ import torch
 from PIL import Image
 from torchvision import transforms
 
-from config import IMAGE_SIZE, MODEL_PATH
-from models.unet import UNet
+from config import IMAGE_SIZE, MODEL_PATH_ATTENTION
+from models.unet_attention import AttentionUNet
 
 
 def test(image_path, output_path):
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    model = UNet().to(device)
-
+    model = AttentionUNet().to(device)
     model.load_state_dict(
-        torch.load(MODEL_PATH, map_location=device)
+        torch.load(MODEL_PATH_ATTENTION, map_location=device, weights_only=True)
     )
-
     model.eval()
 
     transform = transforms.Compose([
@@ -24,28 +22,21 @@ def test(image_path, output_path):
     ])
 
     image = Image.open(image_path).convert("RGB")
-
-    image = transform(image)
-
-    image = image.unsqueeze(0).to(device)
+    image = transform(image).unsqueeze(0).to(device)
 
     with torch.no_grad():
         output = model(image)
 
     output = output.squeeze(0).cpu()
-
     output = torch.clamp(output, 0, 1)
-
     output = transforms.ToPILImage()(output)
-
     output.save(output_path)
 
-    print(f"Dehazed image saved to {output_path}")
+    print(f"Saved to {output_path}")
 
 
 if __name__ == "__main__":
-
     test(
-        "data/train/hazy/1_1_0.90179.png",
-        "outputs/dehazed_image.png"
+        "data/test/hazy/1400_1.png",
+        "outputs/attention_dehazed.png"
     )
