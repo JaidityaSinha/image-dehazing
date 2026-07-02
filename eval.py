@@ -6,8 +6,8 @@ from skimage.metrics import peak_signal_noise_ratio as psnr
 from skimage.metrics import structural_similarity as ssim
 import numpy as np
 
-from config import IMAGE_SIZE, MODEL_PATH, MODEL_PATH_ATTENTION,TEST_HAZY_DIR, TEST_CLEAR_DIR, MODEL_PATH_CHANNEL
-from models.unet_channel_attention import ChannelAttentionUNet
+from config import IMAGE_SIZE, MODEL_PATH, MODEL_PATH_6K,TEST_HAZY_DIR, TEST_CLEAR_DIR, MODEL_PATH_CHANNEL
+from models.unet import UNet
 
 
 def evaluate():
@@ -15,9 +15,9 @@ def evaluate():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    model = ChannelAttentionUNet().to(device)
+    model = UNet().to(device)
     model.load_state_dict(
-        torch.load(MODEL_PATH_CHANNEL, map_location=device, weights_only=True)
+        torch.load(MODEL_PATH_6K, map_location=device, weights_only=True)
     )
     model.eval()
 
@@ -32,7 +32,7 @@ def evaluate():
     )
 
     for image_name in hazy_images[:5]:
-        clear_name = image_name.split("_")[0] + ".png"
+        clear_name = image_name
         clear_path = os.path.join(TEST_CLEAR_DIR, clear_name)
         print(f"{image_name} -> {clear_name} | exists: {os.path.exists(clear_path)}")
 
@@ -42,7 +42,7 @@ def evaluate():
 
     for image_name in hazy_images:
 
-        clear_name = image_name.split("_")[0] + ".png"
+        clear_name = image_name
 
         hazy_path = os.path.join(TEST_HAZY_DIR, image_name)
         clear_path = os.path.join(TEST_CLEAR_DIR, clear_name)
@@ -78,7 +78,7 @@ def evaluate():
     avg_psnr = total_psnr / count
     avg_ssim = total_ssim / count
 
-    print(f"\nResults on ITS Test Set ({count} images)")
+    print(f"\nResults on RESIDE_6K Test Set ({count} images)")
     print(f"Average PSNR: {avg_psnr:.4f} dB")
     print(f"Average SSIM: {avg_ssim:.4f}")
 

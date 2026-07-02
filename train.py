@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 
 from config import *
 from dataset import DehazeDataset
-from models.unet_channel_attention import ChannelAttentionUNet
+from models.unet import UNet
 
 
 def train():
@@ -26,7 +26,7 @@ def train():
         pin_memory=True
     )
 
-    model = ChannelAttentionUNet().to(device)
+    model = UNet().to(device)
 
     criterion = nn.MSELoss()
 
@@ -81,7 +81,7 @@ def train():
 
         if average_loss < best_loss:
             best_loss = average_loss
-            torch.save(model.state_dict(), MODEL_PATH_CHANNEL)
+            torch.save(model.state_dict(), MODEL_PATH_6K)
             print("New best model saved!")
 
         print(f"Epoch Loss: {average_loss:.4f} | Best Loss: {best_loss:.4f} | LR: {optimizer.param_groups[0]['lr']:.6f}")

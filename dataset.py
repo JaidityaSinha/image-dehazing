@@ -32,7 +32,7 @@ class DehazeDataset(Dataset):
     def __getitem__(self, index):
         image_name = self.images[index]
 
-        clear_name = image_name.split("_")[0] + CLEAR_EXT
+        clear_name = image_name
 
         hazy_path = os.path.join(self.hazy_dir, image_name)
         clear_path = os.path.join(self.clear_dir, clear_name)
