@@ -6,18 +6,47 @@ from skimage.metrics import peak_signal_noise_ratio as psnr
 from skimage.metrics import structural_similarity as ssim
 import numpy as np
 
-from config import IMAGE_SIZE, MODEL_PATH, MODEL_PATH_6K,TEST_HAZY_DIR, TEST_CLEAR_DIR, MODEL_PATH_CHANNEL, MODEL_PATH_CHANNEL_6K
-from models.unet_channel_attention import ChannelAttentionUNet
+from config import (
+    IMAGE_SIZE, TEST_HAZY_DIR, TEST_CLEAR_DIR, MODEL_PATH,
+    MODEL_NAME, DATASET_NAME, CLEAR_EXT
+)
+
+
+def get_model():
+    if MODEL_NAME == "baseline":
+        from models.unet import UNet
+        return UNet()
+    elif MODEL_NAME == "attention_gate":
+        from models.unet_attention import AttentionUNet
+        return AttentionUNet()
+    elif MODEL_NAME == "channel_attention":
+        from models.unet_channel_attention import ChannelAttentionUNet
+        return ChannelAttentionUNet()
+    else:
+        raise ValueError(f"Unknown MODEL_NAME: {MODEL_NAME}")
+
+
+def get_clear_filename(hazy_filename):
+    if DATASET_NAME == "its":
+        # e.g. "1_1_0.90179.png" -> "1.png"
+        base_id = hazy_filename.split("_")[0]
+        return f"{base_id}{CLEAR_EXT}"
+    elif DATASET_NAME == "reside6k":
+        # hazy and clear share identical filenames
+        return hazy_filename
+    else:
+        raise ValueError(f"Unknown DATASET_NAME: {DATASET_NAME}")
 
 
 def evaluate():
-
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
+    print(f"Model: {MODEL_NAME} | Dataset: {DATASET_NAME}")
+    print(f"Loading weights from: {MODEL_PATH}")
 
-    model = ChannelAttentionUNet().to(device)
+    model = get_model().to(device)
     model.load_state_dict(
-        torch.load(MODEL_PATH_CHANNEL_6K, map_location=device, weights_only=True)
+        torch.load(MODEL_PATH, map_location=device, weights_only=True)
     )
     model.eval()
 
@@ -26,59 +55,49 @@ def evaluate():
         transforms.ToTensor()
     ])
 
-    hazy_images = sorted(
-        f for f in os.listdir(TEST_HAZY_DIR)
-        if f.lower().endswith((".png", ".jpg", ".jpeg"))
-    )
+    hazy_files = sorted(os.listdir(TEST_HAZY_DIR))
 
-    for image_name in hazy_images[:5]:
-        clear_name = image_name
-        clear_path = os.path.join(TEST_CLEAR_DIR, clear_name)
-        print(f"{image_name} -> {clear_name} | exists: {os.path.exists(clear_path)}")
+    psnr_scores = []
+    ssim_scores = []
+    skipped = 0
 
-    total_psnr = 0.0
-    total_ssim = 0.0
-    count = 0
-
-    for image_name in hazy_images:
-
-        clear_name = image_name
-
-        hazy_path = os.path.join(TEST_HAZY_DIR, image_name)
-        clear_path = os.path.join(TEST_CLEAR_DIR, clear_name)
+    for idx, fname in enumerate(hazy_files):
+        hazy_path = os.path.join(TEST_HAZY_DIR, fname)
+        clear_fname = get_clear_filename(fname)
+        clear_path = os.path.join(TEST_CLEAR_DIR, clear_fname)
 
         if not os.path.exists(clear_path):
+            skipped += 1
             continue
 
         hazy_image = Image.open(hazy_path).convert("RGB")
-        clear_image = Image.open(clear_path).convert("RGB")
-
-        input_tensor = transform(hazy_image).unsqueeze(0).to(device)
-        clear_tensor = transform(clear_image)
+        hazy_tensor = transform(hazy_image).unsqueeze(0).to(device)
 
         with torch.no_grad():
-            output_tensor = model(input_tensor)
+            output = model(hazy_tensor)
 
-        output = output_tensor.squeeze(0).cpu().numpy().transpose(1, 2, 0)
-        target = clear_tensor.numpy().transpose(1, 2, 0)
+        output = output.squeeze(0).cpu()
+        output = torch.clamp(output, 0, 1)
+        output_np = output.permute(1, 2, 0).numpy()
 
-        output = np.clip(output, 0, 1)
-        target = np.clip(target, 0, 1)
+        clear_image = Image.open(clear_path).convert("RGB").resize((IMAGE_SIZE, IMAGE_SIZE))
+        clear_np = np.array(clear_image).astype(np.float32) / 255.0
 
-        p = psnr(target, output, data_range=1.0)
-        s = ssim(target, output, data_range=1.0, channel_axis=2)
+        score_psnr = psnr(clear_np, output_np, data_range=1.0)
+        score_ssim = ssim(clear_np, output_np, data_range=1.0, channel_axis=2)
 
-        total_psnr += p
-        total_ssim += s
-        count += 1
+        psnr_scores.append(score_psnr)
+        ssim_scores.append(score_ssim)
 
-        if count % 100 == 0:
-            print(f"Processed {count}/{len(hazy_images)} | Avg PSNR: {total_psnr/count:.4f} | Avg SSIM: {total_ssim/count:.4f}")
+        if (idx + 1) % 100 == 0:
+            print(f"Processed {idx + 1}/{len(hazy_files)} images...")
 
-    avg_psnr = total_psnr / count
-    avg_ssim = total_ssim / count
+    avg_psnr = np.mean(psnr_scores)
+    avg_ssim = np.mean(ssim_scores)
 
-    print(f"\nResults on RESIDE_6K Test Set ({count} images)")
+    print(f"\n--- Evaluation Results ---")
+    print(f"Model: {MODEL_NAME} | Dataset: {DATASET_NAME}")
+    print(f"Images evaluated: {len(psnr_scores)} (skipped: {skipped})")
     print(f"Average PSNR: {avg_psnr:.4f} dB")
     print(f"Average SSIM: {avg_ssim:.4f}")
 
