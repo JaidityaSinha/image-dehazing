@@ -27,6 +27,21 @@ EPOCHS_LOOKUP = {
 EPOCHS = EPOCHS_LOOKUP.get((MODEL_NAME, DATASET_NAME), 50)
 
 # ----------------------------------------------------------------------
+# Early stopping / validation
+# A slice of the training set is held out each run for validation, so
+# training can stop automatically instead of being watched manually.
+# ----------------------------------------------------------------------
+VALIDATION_SPLIT = 0.1       # fraction of training data held out for validation
+EARLY_STOP_PATIENCE = 5      # stop if val loss doesn't improve for this many epochs
+MAX_EPOCHS = 100             # hard ceiling regardless of EPOCHS_LOOKUP above
+
+# ----------------------------------------------------------------------
+# Loss function
+# Options: "mse" | "ssim"
+# ----------------------------------------------------------------------
+LOSS_TYPE = "ssim"
+
+# ----------------------------------------------------------------------
 # Dataset paths
 # NOTE: swap the contents of data/train and data/test between ITS and
 # RESIDE-6K before running, since both datasets share the same folder
@@ -55,7 +70,14 @@ MODEL_PATH_LOOKUP = {
     ("baseline", "reside6k"): "outputs/unet_6k.pth",
     ("channel_attention", "reside6k"): "outputs/unet_channel_6k.pth",
 }
-MODEL_PATH = MODEL_PATH_LOOKUP[(MODEL_NAME, DATASET_NAME)]
+
+if LOSS_TYPE == "mse":
+    MODEL_PATH = MODEL_PATH_LOOKUP[(MODEL_NAME, DATASET_NAME)]
+else:
+    # non-MSE loss runs (e.g. ssim) get their own suffixed checkpoint
+    # so they never overwrite the original MSE-trained weights
+    base_path = MODEL_PATH_LOOKUP[(MODEL_NAME, DATASET_NAME)]
+    MODEL_PATH = base_path.replace(".pth", f"_{LOSS_TYPE}.pth")
 
 # Kept for backward compatibility with older scripts that import these directly
 MODEL_PATH_ATTENTION = MODEL_PATH_LOOKUP[("attention_gate", "its")]
