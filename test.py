@@ -19,6 +19,9 @@ def get_model():
     elif MODEL_NAME == "channel_attention":
         from models.unet_channel_attention import ChannelAttentionUNet
         return ChannelAttentionUNet()
+    elif MODEL_NAME == "depthwise_separable":
+        from models.unet_depthwise import DepthwiseSeparableUNet
+        return DepthwiseSeparableUNet()
     else:
         raise ValueError(f"Unknown MODEL_NAME: {MODEL_NAME}")
 

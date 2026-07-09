@@ -4,15 +4,15 @@ LEARNING_RATE = 1e-4
 
 # ----------------------------------------------------------------------
 # Model selection
-# Options: "baseline" | "attention_gate" | "channel_attention"
+# Options: "baseline" | "channel_attention" | "depthwise_separable"
 # ----------------------------------------------------------------------
-MODEL_NAME = "channel_attention"
+MODEL_NAME = "depthwise_separable"
 
 # ----------------------------------------------------------------------
 # Dataset selection
 # Options: "its" | "reside6k"
 # ----------------------------------------------------------------------
-DATASET_NAME = "reside6k"
+DATASET_NAME = "its"
 
 # ----------------------------------------------------------------------
 # Epochs per model/dataset combo (based on what worked during experiments)
@@ -32,14 +32,14 @@ EPOCHS = EPOCHS_LOOKUP.get((MODEL_NAME, DATASET_NAME), 50)
 # training can stop automatically instead of being watched manually.
 # ----------------------------------------------------------------------
 VALIDATION_SPLIT = 0.1       # fraction of training data held out for validation
-EARLY_STOP_PATIENCE = 5      # stop if val loss doesn't improve for this many epochs
+EARLY_STOP_PATIENCE = 6      # stop if val loss doesn't improve for this many epochs
 MAX_EPOCHS = 100             # hard ceiling regardless of EPOCHS_LOOKUP above
 
 # ----------------------------------------------------------------------
 # Loss function
 # Options: "mse" | "ssim"
 # ----------------------------------------------------------------------
-LOSS_TYPE = "ssim"
+LOSS_TYPE = "mse"
 
 # ----------------------------------------------------------------------
 # Dataset paths
@@ -69,6 +69,8 @@ MODEL_PATH_LOOKUP = {
     ("channel_attention", "its"): "outputs/unet_channel_its.pth",
     ("baseline", "reside6k"): "outputs/unet_6k.pth",
     ("channel_attention", "reside6k"): "outputs/unet_channel_6k.pth",
+    ("depthwise_separable", "its"): "outputs/unet_depthwise_its.pth",
+    ("depthwise_separable", "reside6k"): "outputs/unet_depthwise_6k.pth",
 }
 
 if LOSS_TYPE == "mse":
