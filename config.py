@@ -12,7 +12,7 @@ MODEL_NAME = "depthwise_separable"
 # Dataset selection
 # Options: "its" | "reside6k"
 # ----------------------------------------------------------------------
-DATASET_NAME = "its"
+DATASET_NAME = "reside6k"
 
 # ----------------------------------------------------------------------
 # Epochs per model/dataset combo (based on what worked during experiments)
@@ -32,14 +32,14 @@ EPOCHS = EPOCHS_LOOKUP.get((MODEL_NAME, DATASET_NAME), 50)
 # training can stop automatically instead of being watched manually.
 # ----------------------------------------------------------------------
 VALIDATION_SPLIT = 0.1       # fraction of training data held out for validation
-EARLY_STOP_PATIENCE = 6      # stop if val loss doesn't improve for this many epochs
+EARLY_STOP_PATIENCE = 5      # stop if val loss doesn't improve for this many epochs
 MAX_EPOCHS = 100             # hard ceiling regardless of EPOCHS_LOOKUP above
 
 # ----------------------------------------------------------------------
 # Loss function
 # Options: "mse" | "ssim"
 # ----------------------------------------------------------------------
-LOSS_TYPE = "mse"
+LOSS_TYPE = "ssim"
 
 # ----------------------------------------------------------------------
 # Dataset paths
