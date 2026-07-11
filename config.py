@@ -39,7 +39,7 @@ MAX_EPOCHS = 100             # hard ceiling regardless of EPOCHS_LOOKUP above
 # Loss function
 # Options: "mse" | "ssim"
 # ----------------------------------------------------------------------
-LOSS_TYPE = "mse"
+LOSS_TYPE = "ssim"
 
 # ----------------------------------------------------------------------
 # Dataset paths
