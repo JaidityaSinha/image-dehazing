@@ -25,6 +25,15 @@ def get_model():
     elif MODEL_NAME == "depthwise_separable":
         from models.unet_depthwise import DepthwiseSeparableUNet
         return DepthwiseSeparableUNet()
+    elif MODEL_NAME == "depthwise_ca_skip":
+        from models.unet_depthwise_ca_skip import DepthwiseSeparableUNetCASkip
+        return DepthwiseSeparableUNetCASkip()
+    elif MODEL_NAME == "depthwise_ca_skip_fft":
+        from models.unet_depthwise_ca_skip_fft import DepthwiseSeparableUNetCASkipFFT
+        return DepthwiseSeparableUNetCASkipFFT()
+    elif MODEL_NAME == "depthwise_channel_attention":
+        from models.unet_depthwise_channel_attention import DepthwiseSeparableChannelAttentionUNet
+        return DepthwiseSeparableChannelAttentionUNet()
     else:
         raise ValueError(f"Unknown MODEL_NAME: {MODEL_NAME}")
 

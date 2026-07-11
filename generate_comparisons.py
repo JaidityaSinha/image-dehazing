@@ -7,6 +7,11 @@ from torchvision import transforms
 from models.unet import UNet
 from models.unet_channel_attention import ChannelAttentionUNet
 from models.unet_depthwise import DepthwiseSeparableUNet
+from models.unet_depthwise_ca_skip import DepthwiseSeparableUNetCASkip
+from models.unet_depthwise_ca_skip_fft import DepthwiseSeparableUNetCASkipFFT
+from models.unet_depthwise_channel_attention import (
+    DepthwiseSeparableChannelAttentionUNet,
+)
 
 IMAGE_SIZE = 256
 NUM_SAMPLES = 3
@@ -30,29 +35,65 @@ OUTPUT_ROOT = "outputs/comparisons"
 # Add new rows here as new experiments (e.g. ablation variants) complete.
 # ----------------------------------------------------------------------
 CHECKPOINTS = {
+    # ---------------- ITS ----------------
     ("baseline", "its", "mse"): "outputs/unet_its.pth",
     ("baseline", "its", "ssim"): "outputs/unet_its_ssim.pth",
+
     ("channel_attention", "its", "mse"): "outputs/unet_channel_its.pth",
     ("channel_attention", "its", "ssim"): "outputs/unet_channel_its_ssim.pth",
+
     ("depthwise_separable", "its", "mse"): "outputs/unet_depthwise_its.pth",
     ("depthwise_separable", "its", "ssim"): "outputs/unet_depthwise_its_ssim.pth",
 
+    ("depthwise_ca_skip", "its", "mse"): "outputs/unet_depthwise_ca_skip_its.pth",
+    ("depthwise_ca_skip", "its", "ssim"): "outputs/unet_depthwise_ca_skip_its_ssim.pth",
+
+    ("depthwise_ca_skip_fft", "its", "mse"): "outputs/unet_depthwise_ca_skip_fft_its.pth",
+    ("depthwise_ca_skip_fft", "its", "ssim"): "outputs/unet_depthwise_ca_skip_fft_its_ssim.pth",
+
+    ("depthwise_channel_attention", "its", "mse"): "outputs/unet_depthwise_ca_its.pth",
+    ("depthwise_channel_attention", "its", "ssim"): "outputs/unet_depthwise_ca_its_ssim.pth",
+
+    # ---------------- RESIDE-6K ----------------
     ("baseline", "reside6k", "mse"): "outputs/unet_6k.pth",
     ("baseline", "reside6k", "ssim"): "outputs/unet_6k_ssim.pth",
+
     ("channel_attention", "reside6k", "mse"): "outputs/unet_channel_6k.pth",
     ("channel_attention", "reside6k", "ssim"): "outputs/unet_channel_6k_ssim.pth",
+
     ("depthwise_separable", "reside6k", "mse"): "outputs/unet_depthwise_6k.pth",
     ("depthwise_separable", "reside6k", "ssim"): "outputs/unet_depthwise_6k_ssim.pth",
+
+    ("depthwise_ca_skip", "reside6k", "mse"): "outputs/unet_depthwise_ca_skip_6k.pth",
+    ("depthwise_ca_skip", "reside6k", "ssim"): "outputs/unet_depthwise_ca_skip_6k_ssim.pth",
+
+    ("depthwise_ca_skip_fft", "reside6k", "mse"): "outputs/unet_depthwise_ca_skip_fft_6k.pth",
+    ("depthwise_ca_skip_fft", "reside6k", "ssim"): "outputs/unet_depthwise_ca_skip_fft_6k_ssim.pth",
+
+    ("depthwise_channel_attention", "reside6k", "mse"): "outputs/unet_depthwise_ca_6k.pth",
+    ("depthwise_channel_attention", "reside6k", "ssim"): "outputs/unet_depthwise_ca_6k_ssim.pth",
 }
 
 
 def get_model(model_name):
     if model_name == "baseline":
         return UNet()
+
     elif model_name == "channel_attention":
         return ChannelAttentionUNet()
+
     elif model_name == "depthwise_separable":
         return DepthwiseSeparableUNet()
+
+    elif model_name == "depthwise_ca_skip":
+        return DepthwiseSeparableUNetCASkip()
+
+    elif model_name == "depthwise_ca_skip_fft":
+        return DepthwiseSeparableUNetCASkipFFT()
+
+    elif model_name == "depthwise_channel_attention":
+        return DepthwiseSeparableChannelAttentionUNet()
+
     else:
         raise ValueError(f"Unknown model_name: {model_name}")
 

@@ -4,9 +4,10 @@ LEARNING_RATE = 1e-4
 
 # ----------------------------------------------------------------------
 # Model selection
-# Options: "baseline" | "channel_attention" | "depthwise_separable"
+# Options: "baseline" | "attention_gate" | "channel_attention" | "depthwise_separable"
+#        | "depthwise_ca_skip" | "depthwise_ca_skip_fft" | "depthwise_channel_attention"
 # ----------------------------------------------------------------------
-MODEL_NAME = "depthwise_separable"
+MODEL_NAME = "depthwise_ca_skip_fft"
 
 # ----------------------------------------------------------------------
 # Dataset selection
@@ -39,7 +40,7 @@ MAX_EPOCHS = 100             # hard ceiling regardless of EPOCHS_LOOKUP above
 # Loss function
 # Options: "mse" | "ssim"
 # ----------------------------------------------------------------------
-LOSS_TYPE = "ssim"
+LOSS_TYPE = "mse"
 
 # ----------------------------------------------------------------------
 # Dataset paths
@@ -71,6 +72,12 @@ MODEL_PATH_LOOKUP = {
     ("channel_attention", "reside6k"): "outputs/unet_channel_6k.pth",
     ("depthwise_separable", "its"): "outputs/unet_depthwise_its.pth",
     ("depthwise_separable", "reside6k"): "outputs/unet_depthwise_6k.pth",
+    ("depthwise_ca_skip", "its"): "outputs/unet_depthwise_ca_skip_its.pth",
+    ("depthwise_ca_skip", "reside6k"): "outputs/unet_depthwise_ca_skip_6k.pth",
+    ("depthwise_ca_skip_fft", "its"): "outputs/unet_depthwise_ca_skip_fft_its.pth",
+    ("depthwise_ca_skip_fft", "reside6k"): "outputs/unet_depthwise_ca_skip_fft_6k.pth",
+    ("depthwise_channel_attention", "its"): "outputs/unet_depthwise_ca_its.pth",
+    ("depthwise_channel_attention", "reside6k"): "outputs/unet_depthwise_ca_6k.pth",
 }
 
 if LOSS_TYPE == "mse":

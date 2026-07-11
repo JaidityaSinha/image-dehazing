@@ -10,7 +10,6 @@ from config import (
 )
 from dataset import DehazeDataset
 
-MIN_DELTA = 1e-4
 
 def get_model():
     if MODEL_NAME == "baseline":
@@ -25,6 +24,15 @@ def get_model():
     elif MODEL_NAME == "depthwise_separable":
         from models.unet_depthwise import DepthwiseSeparableUNet
         return DepthwiseSeparableUNet()
+    elif MODEL_NAME == "depthwise_ca_skip":
+        from models.unet_depthwise_ca_skip import DepthwiseSeparableUNetCASkip
+        return DepthwiseSeparableUNetCASkip()
+    elif MODEL_NAME == "depthwise_ca_skip_fft":
+        from models.unet_depthwise_ca_skip_fft import DepthwiseSeparableUNetCASkipFFT
+        return DepthwiseSeparableUNetCASkipFFT()
+    elif MODEL_NAME == "depthwise_channel_attention":
+        from models.unet_depthwise_channel_attention import DepthwiseSeparableChannelAttentionUNet
+        return DepthwiseSeparableChannelAttentionUNet()
     else:
         raise ValueError(f"Unknown MODEL_NAME: {MODEL_NAME}")
 
@@ -147,7 +155,7 @@ def train():
         scheduler.step(avg_val_loss)
 
         # ---- Early stopping / checkpointing on VALIDATION loss ----
-        if avg_val_loss < best_val_loss - MIN_DELTA:
+        if avg_val_loss < best_val_loss:
             best_val_loss = avg_val_loss
             epochs_no_improve = 0
             torch.save(model.state_dict(), MODEL_PATH)
