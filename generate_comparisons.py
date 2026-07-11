@@ -17,11 +17,11 @@ SEED = 42
 # Both datasets are referenced directly so no manual swapping of
 # data/train or data/test is needed to run this script.
 # ----------------------------------------------------------------------
-ITS_TEST_HAZY = r"data\test\hazy"
-ITS_TEST_CLEAR = r"data\test\clear"
+ITS_TEST_HAZY =  "" # Enter the ITS dataset clear path here
+ITS_TEST_CLEAR = "" # Enter the ITS dataset clear path here
 
-RESIDE6K_TEST_HAZY = r"reside6k\RESIDE-6K\test\hazy"
-RESIDE6K_TEST_CLEAR = r"reside6k\RESIDE-6K\test\clear"
+RESIDE6K_TEST_HAZY = ""  # Enter the RESIDE6K dataset hazy path here
+RESIDE6K_TEST_CLEAR = "" # Enter the RESIDE6K dataset clear path here
 
 OUTPUT_ROOT = "outputs/comparisons"
 
