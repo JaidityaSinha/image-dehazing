@@ -16,12 +16,9 @@ This project was developed as part of a Summer Internship in Deep Learning and C
 
 ## Overview
 
-Atmospheric haze significantly degrades image quality by reducing contrast and obscuring scene details. This project investigates the effectiveness of different UNet-based architectures for restoring haze-free images from a single hazy input image.
+Atmospheric haze significantly degrades image quality by reducing contrast and obscuring scene details. This project investigates UNet-based architectures for restoring haze-free images from a single hazy input image.
 
-The following architectures were implemented and compared:
-
-- Baseline UNet
-- Channel Attention UNet (Squeeze-and-Excitation based)
+In addition to the Baseline UNet and Channel Attention UNet, this work includes a lightweight UNet variant that incorporates **Depthwise Separable Convolutions**  to improve feature representation while reducing computational complexity.
 
 Performance is evaluated using:
 
@@ -32,10 +29,10 @@ Performance is evaluated using:
 
 ## Highlights
 
-- Implemented Baseline UNet and Channel Attention UNet in PyTorch
-- Trained and evaluated on ITS and RESIDE-6K datasets
-- Achieved **28.23 dB PSNR** and **0.9563 SSIM** on RESIDE-6K
-- Improved baseline performance by **+1.12 dB PSNR** and **+0.0074 SSIM**
+- Implemented Baseline UNet, Channel Attention UNet and Depthwise Separable UNet with Channel Attention in PyTorch.
+- Trained and evaluated all models on the ITS and RESIDE-6K datasets.
+- Channel Attention Unet achieved **28.54 dB PSNR** and **0.9651 SSIM** on RESIDE-6K, improving baseline performance by **+1.43 dB PSNR** and **+0.0162 SSIM**.
+- Depthwise Separable UNet with channel attention achieved **28.18 dB PSNR** and **0.9636 SSIM** on RESIDE-6K, improving baseline performance by **+1.07 dB PSNR**   and **+0.0147 SSIM**.
 
 ---
 
