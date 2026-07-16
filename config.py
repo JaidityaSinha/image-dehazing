@@ -13,7 +13,7 @@ MODEL_NAME = "depthwise_ca_skip_fft"
 # Dataset selection
 # Options: "its" | "reside6k"
 # ----------------------------------------------------------------------
-DATASET_NAME = "reside6k"
+DATASET_NAME = "its"
 
 # ----------------------------------------------------------------------
 # Epochs per model/dataset combo (based on what worked during experiments)
