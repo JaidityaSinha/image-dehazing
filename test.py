@@ -5,7 +5,7 @@ from torchvision import transforms
 
 from config import (
     IMAGE_SIZE, TEST_HAZY_DIR, TEST_CLEAR_DIR, MODEL_PATH,
-    MODEL_NAME, DATASET_NAME, CLEAR_EXT
+    MODEL_NAME, DATASET_NAME, CLEAR_EXT, OHAZE_TEST_HAZY, OHAZE_TEST_CLEAR
 )
 
 
@@ -22,6 +22,15 @@ def get_model():
     elif MODEL_NAME == "depthwise_separable":
         from models.unet_depthwise import DepthwiseSeparableUNet
         return DepthwiseSeparableUNet()
+    elif MODEL_NAME == "depthwise_ca_skip":
+        from models.unet_depthwise_ca_skip import DepthwiseSeparableUNetCASkip
+        return DepthwiseSeparableUNetCASkip()
+    elif MODEL_NAME == "depthwise_ca_skip_fft":
+        from models.unet_depthwise_ca_skip_fft import DepthwiseSeparableUNetCASkipFFT
+        return DepthwiseSeparableUNetCASkipFFT()
+    elif MODEL_NAME == "depthwise_channel_attention":
+        from models.unet_depthwise_channel_attention import DepthwiseSeparableChannelAttentionUNet
+        return DepthwiseSeparableChannelAttentionUNet()
     else:
         raise ValueError(f"Unknown MODEL_NAME: {MODEL_NAME}")
 
@@ -34,8 +43,18 @@ def get_clear_filename(hazy_filename):
     elif DATASET_NAME == "reside6k":
         # hazy and clear share identical filenames
         return hazy_filename
+    elif DATASET_NAME == "ohaze":
+        # e.g. "oh41_hazy.png" -> "oh41.png"
+        base_id = hazy_filename.rsplit("_hazy", 1)[0]
+        return f"{base_id}{CLEAR_EXT}"
     else:
         raise ValueError(f"Unknown DATASET_NAME: {DATASET_NAME}")
+
+
+def get_test_dirs():
+    if DATASET_NAME == "ohaze":
+        return OHAZE_TEST_HAZY, OHAZE_TEST_CLEAR
+    return TEST_HAZY_DIR, TEST_CLEAR_DIR
 
 
 def get_sample_files(hazy_dir, n=5):
@@ -43,7 +62,7 @@ def get_sample_files(hazy_dir, n=5):
     For ITS, multiple hazy files can share the same base scene at different
     haze levels (e.g. 1_1_0.9.png, 1_2_0.8.png) -- only the first variant
     per base id is kept so samples show different scenes, not haze levels.
-    For RESIDE-6K, filenames are already unique per scene.
+    For RESIDE-6K and O-HAZE, filenames are already unique per scene.
     """
     all_files = sorted(os.listdir(hazy_dir))
 
@@ -105,12 +124,13 @@ if __name__ == "__main__":
     output_dir = f"outputs/comparison_{MODEL_NAME}_{DATASET_NAME}"
     os.makedirs(output_dir, exist_ok=True)
 
-    sample_files = get_sample_files(TEST_HAZY_DIR, n=5)
+    hazy_dir, clear_dir = get_test_dirs()
+    sample_files = get_sample_files(hazy_dir, n=5)
 
     for fname in sample_files:
-        hazy_path = os.path.join(TEST_HAZY_DIR, fname)
+        hazy_path = os.path.join(hazy_dir, fname)
         clear_fname = get_clear_filename(fname)
-        clear_path = os.path.join(TEST_CLEAR_DIR, clear_fname)
+        clear_path = os.path.join(clear_dir, clear_fname)
 
         if not os.path.exists(clear_path):
             print(f"Skipping {fname}: no matching clear image at {clear_path}")

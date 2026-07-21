@@ -8,7 +8,7 @@ import numpy as np
 
 from config import (
     IMAGE_SIZE, TEST_HAZY_DIR, TEST_CLEAR_DIR, MODEL_PATH,
-    MODEL_NAME, DATASET_NAME, CLEAR_EXT
+    MODEL_NAME, DATASET_NAME, CLEAR_EXT, OHAZE_TEST_HAZY, OHAZE_TEST_CLEAR
 )
 
 
@@ -46,8 +46,18 @@ def get_clear_filename(hazy_filename):
     elif DATASET_NAME == "reside6k":
         # hazy and clear share identical filenames
         return hazy_filename
+    elif DATASET_NAME == "ohaze":
+        # e.g. "oh41_hazy.png" -> "oh41.png"
+        base_id = hazy_filename.rsplit("_hazy", 1)[0]
+        return f"{base_id}{CLEAR_EXT}"
     else:
         raise ValueError(f"Unknown DATASET_NAME: {DATASET_NAME}")
+
+
+def get_test_dirs():
+    if DATASET_NAME == "ohaze":
+        return OHAZE_TEST_HAZY, OHAZE_TEST_CLEAR
+    return TEST_HAZY_DIR, TEST_CLEAR_DIR
 
 
 def evaluate():
@@ -67,16 +77,17 @@ def evaluate():
         transforms.ToTensor()
     ])
 
-    hazy_files = sorted(os.listdir(TEST_HAZY_DIR))
+    hazy_dir, clear_dir = get_test_dirs()
+    hazy_files = sorted(os.listdir(hazy_dir))
 
     psnr_scores = []
     ssim_scores = []
     skipped = 0
 
     for idx, fname in enumerate(hazy_files):
-        hazy_path = os.path.join(TEST_HAZY_DIR, fname)
+        hazy_path = os.path.join(hazy_dir, fname)
         clear_fname = get_clear_filename(fname)
-        clear_path = os.path.join(TEST_CLEAR_DIR, clear_fname)
+        clear_path = os.path.join(clear_dir, clear_fname)
 
         if not os.path.exists(clear_path):
             skipped += 1

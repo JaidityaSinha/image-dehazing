@@ -7,13 +7,13 @@ LEARNING_RATE = 1e-4
 # Options: "baseline" | "attention_gate" | "channel_attention" | "depthwise_separable"
 #        | "depthwise_ca_skip" | "depthwise_ca_skip_fft" | "depthwise_channel_attention"
 # ----------------------------------------------------------------------
-MODEL_NAME = "depthwise_ca_skip_fft"
+MODEL_NAME = "channel_attention"
 
 # ----------------------------------------------------------------------
 # Dataset selection
-# Options: "its" | "reside6k"
+# Options: "its" | "reside6k" | "ohaze"
 # ----------------------------------------------------------------------
-DATASET_NAME = "its"
+DATASET_NAME = "ohaze"
 
 # ----------------------------------------------------------------------
 # Epochs per model/dataset combo (based on what worked during experiments)
@@ -33,7 +33,7 @@ EPOCHS = EPOCHS_LOOKUP.get((MODEL_NAME, DATASET_NAME), 50)
 # training can stop automatically instead of being watched manually.
 # ----------------------------------------------------------------------
 VALIDATION_SPLIT = 0.1       # fraction of training data held out for validation
-EARLY_STOP_PATIENCE = 5      # stop if val loss doesn't improve for this many epochs
+EARLY_STOP_PATIENCE = 6      # stop if val loss doesn't improve for this many epochs
 MAX_EPOCHS = 100             # hard ceiling regardless of EPOCHS_LOOKUP above
 
 # ----------------------------------------------------------------------
@@ -58,8 +58,19 @@ TEST_CLEAR_DIR = "data/test/clear"
 CLEAR_EXT_LOOKUP = {
     "its": ".png",
     "reside6k": ".jpg",
+    "ohaze": ".png",
 }
 CLEAR_EXT = CLEAR_EXT_LOOKUP[DATASET_NAME]
+
+# ----------------------------------------------------------------------
+# O-HAZE is used for evaluation only (cross-dataset generalization test
+# on real captured haze, not synthetic) -- it is never trained on, so
+# it has its own fixed paths rather than sharing TRAIN/TEST_HAZY_DIR,
+# which avoids needing to manually swap data/train or data/test.
+# O-HAZE filenames: hazy "oh41_hazy.png" -> clear "oh41.png"
+# ----------------------------------------------------------------------
+OHAZE_TEST_HAZY = "data/test/hazy"
+OHAZE_TEST_CLEAR = "data/test/clear"
 
 # ----------------------------------------------------------------------
 # Model checkpoint paths (one per model/dataset combo)
@@ -80,7 +91,13 @@ MODEL_PATH_LOOKUP = {
     ("depthwise_channel_attention", "reside6k"): "outputs/unet_depthwise_ca_6k.pth",
 }
 
-if LOSS_TYPE == "mse":
+if DATASET_NAME == "ohaze":
+    # O-HAZE is evaluation-only (real captured haze, cross-dataset
+    # generalization test) -- no model is trained on it directly.
+    # It reuses the best-performing checkpoint found so far:
+    # Channel Attention UNet, SSIM loss, trained on RESIDE-6K.
+    MODEL_PATH = "outputs/unet_channel_6k_ssim.pth"
+elif LOSS_TYPE == "mse":
     MODEL_PATH = MODEL_PATH_LOOKUP[(MODEL_NAME, DATASET_NAME)]
 else:
     # non-MSE loss runs (e.g. ssim) get their own suffixed checkpoint
