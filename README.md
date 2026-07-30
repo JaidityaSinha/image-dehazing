@@ -9,48 +9,46 @@
 # Deep Learning-based Single Image Dehazing
 ### A Comparative Study of U-Net Architectures
 
-This repository presents a comparative study of **six U-Net-based deep learning architectures** for **single image dehazing**, developed using **PyTorch**.
+This repository presents a comparative study of **six U-Net-based deep learning architectures** for **single image dehazing**, implemented using **PyTorch**.
 
-The project investigates how architectural modifications such as **Channel Attention**, **Depthwise Separable Convolutions**, **FFT-based Frequency Enhancement**, and **SSIM-based optimization** affect restoration quality, parameter efficiency, and computational complexity.
+The project investigates how architectural enhancements including **Channel Attention**, **Depthwise Separable Convolutions**, **FFT-based Frequency Enhancement**, and **SSIM-based optimization** influence restoration quality, computational efficiency, and model complexity.
 
-Developed during the **Summer Internship in Deep Learning and Computer Vision** under the guidance of **Dr. Madhuchhanda Dasgupta**.
+The work was completed as part of a **Summer Internship in Deep Learning and Computer Vision** under the guidance of **Dr. Madhuchhanda Dasgupta**.
 
 ---
 
 # Overview
 
-Atmospheric haze degrades image quality by scattering light, reducing contrast, washing out colors, and obscuring fine details. These degradations negatively impact both human perception and downstream computer vision applications such as autonomous driving, surveillance, robotics, and remote sensing.
+Atmospheric haze significantly degrades image quality by scattering light, reducing visibility, lowering contrast, and distorting scene colors. These degradations adversely affect both human perception and numerous computer vision applications, including autonomous driving, surveillance, robotics, and remote sensing.
 
-This project explores multiple U-Net variants that progressively improve reconstruction quality while reducing computational cost.
-
-The models were trained and evaluated on the **ITS** and **RESIDE-6K** benchmark datasets using both **Mean Squared Error (MSE)** and **Structural Similarity (SSIM)** loss functions.
+This project performs a comprehensive comparison of multiple U-Net variants ranging from the baseline architecture to lightweight attention-enhanced models. Each model is evaluated on the **ITS** and **RESIDE-6K** datasets using both **Mean Squared Error (MSE)** and **Structural Similarity (SSIM)** loss functions.
 
 ---
 
-# Highlights
+# Features
 
--  Six U-Net architectures implemented from scratch in PyTorch
--  Comparative evaluation across indoor and outdoor datasets
--  Channel Attention using Squeeze-and-Excitation blocks
--  Lightweight Depthwise Separable U-Net variants
--  FFT-enhanced skip connections for frequency-domain refinement
--  Comparison of MSE Loss and SSIM Loss
--  Parameter efficiency analysis
--  Ablation study on attention placement
--  Benchmark comparison with published image dehazing methods
+- Six U-Net architectures implemented entirely in PyTorch
+- Comparative evaluation on indoor and outdoor dehazing benchmarks
+- Channel Attention using Squeeze-and-Excitation (SE) blocks
+- Lightweight architectures using Depthwise Separable Convolutions
+- FFT-enhanced skip connections for frequency-domain refinement
+- Performance comparison using MSE Loss and SSIM Loss
+- Parameter efficiency and complexity analysis
+- Ablation study of architectural improvements
+- Comparison with published image dehazing methods
 
 ---
 
-# Implemented Architectures
+# Implemented Models
 
 | Model | Description |
-|------|-------------|
-| Baseline U-Net | Standard encoder-decoder architecture |
+|--------|-------------|
+| Baseline U-Net | Standard encoder-decoder U-Net |
 | Channel Attention U-Net | U-Net with SE-based Channel Attention |
-| Depthwise Separable U-Net | Lightweight architecture replacing standard convolutions |
-| Depthwise + Skip Channel Attention | Channel Attention applied on skip features |
-| Depthwise + Full Channel Attention | Attention applied throughout the network |
-| Depthwise + Skip Channel Attention + FFT | Frequency-enhanced lightweight architecture |
+| Depthwise Separable U-Net | Lightweight U-Net using depthwise separable convolutions |
+| Depthwise + Skip Channel Attention | Lightweight model with attention applied to skip connections |
+| Depthwise + Full Channel Attention | Lightweight model with attention throughout the network |
+| Depthwise + Skip Channel Attention + FFT | Lightweight architecture with frequency-domain enhancement |
 
 ---
 
@@ -73,12 +71,15 @@ image-dehazing/
 │   └── depthwise_skip_ca_fft.py
 │
 ├── outputs/
+├── weights/
+│   └── README.md
 │
 ├── config.py
 ├── dataset.py
 ├── train.py
 ├── eval.py
 ├── test.py
+├── requirements.txt
 └── README.md
 ```
 
@@ -86,20 +87,20 @@ image-dehazing/
 
 # Datasets
 
-The datasets are **not included** due to their size.
+The datasets are not included in this repository due to their size.
 
-Training and evaluation were performed on the following public datasets.
+Training and evaluation were conducted using the following publicly available datasets.
 
 ## ITS (Indoor Training Set)
 
-- Synthetic indoor hazy images
-- Paired hazy/clear image dataset
-- Evaluated on SOTS-Indoor
+- Synthetic indoor hazy image dataset
+- Paired hazy and ground-truth images
+- Evaluated using the SOTS-Indoor benchmark
 
 ## RESIDE-6K
 
-- Outdoor synthetic haze benchmark
-- Large-scale paired dataset
+- Large-scale outdoor image dehazing dataset
+- Paired hazy and clear image dataset
 - Separate testing split for evaluation
 
 ---
@@ -110,9 +111,9 @@ Training and evaluation were performed on the following public datasets.
 |-----------|-------|
 | Framework | PyTorch |
 | Optimizer | Adam |
-| Learning Rate | 1e-4 |
+| Learning Rate | 1 × 10⁻⁴ |
 | Batch Size | 8 |
-| Image Size | 256 × 256 |
+| Image Resolution | 256 × 256 |
 | Scheduler | ReduceLROnPlateau |
 | Output Activation | Sigmoid |
 | Loss Functions | MSE Loss, SSIM Loss |
@@ -123,68 +124,83 @@ Training and evaluation were performed on the following public datasets.
 
 | Model | Parameters |
 |--------|-----------:|
-| Baseline U-Net | 31,031,875 |
-| Channel Attention U-Net | 31,249,987 |
-| Depthwise Separable U-Net | 5,988,382 |
-| Depthwise + Skip Channel Attention | 6,031,902 |
-| Depthwise + Full Channel Attention | 6,206,494 |
-| Depthwise + Skip CA + FFT | 8,821,022 |
+| Baseline U-Net | 31.03 M |
+| Channel Attention U-Net | 31.25 M |
+| Depthwise Separable U-Net | 5.99 M |
+| Depthwise + Skip Channel Attention | 6.03 M |
+| Depthwise + Full Channel Attention | 6.21 M |
+| Depthwise + Skip Channel Attention + FFT | 8.82 M |
 
 ---
 
 # Quantitative Results (SSIM Loss)
 
-## ITS
+## ITS Dataset
 
 | Model | PSNR (dB) | SSIM |
 |--------|----------:|------:|
 | Baseline U-Net | 26.42 | 0.9532 |
 | **Channel Attention U-Net** | **27.17** | **0.9572** |
 | Depthwise Separable U-Net | 26.04 | 0.9468 |
-| Depthwise + Skip CA | 26.56 | 0.9525 |
-| Depthwise + Full CA | 26.93 | 0.9559 |
-| Depthwise + Skip CA + FFT | 27.08 | 0.9570 |
+| Depthwise + Skip Channel Attention | 26.56 | 0.9525 |
+| Depthwise + Full Channel Attention | 26.93 | 0.9559 |
+| Depthwise + Skip Channel Attention + FFT | 27.08 | 0.9570 |
 
----
-
-## RESIDE-6K
+## RESIDE-6K Dataset
 
 | Model | PSNR (dB) | SSIM |
 |--------|----------:|------:|
 | Baseline U-Net | 28.07 | 0.9621 |
 | **Channel Attention U-Net** | **28.54** | **0.9651** |
 | Depthwise Separable U-Net | 26.67 | 0.9506 |
-| Depthwise + Skip CA | 27.53 | 0.9604 |
-| Depthwise + Full CA | 28.18 | 0.9636 |
-| Depthwise + Skip CA + FFT | 28.40 | 0.9645 |
+| Depthwise + Skip Channel Attention | 27.53 | 0.9604 |
+| Depthwise + Full Channel Attention | 28.18 | 0.9636 |
+| Depthwise + Skip Channel Attention + FFT | 28.40 | 0.9645 |
 
 ---
 
 # Key Findings
 
-- **Channel Attention** consistently improved image restoration across both datasets.
-- **SSIM Loss** produced superior perceptual quality compared to MSE Loss.
-- **Depthwise Separable Convolutions** reduced trainable parameters by approximately **81%** while maintaining competitive performance.
-- Incorporating **Channel Attention** significantly recovered the performance loss introduced by lightweight convolutions.
+- Channel Attention consistently improved reconstruction quality over the baseline architecture.
+- SSIM Loss produced better perceptual image quality than MSE Loss across all evaluated models.
+- Depthwise Separable Convolutions reduced the number of trainable parameters by approximately **81%** while maintaining competitive performance.
+- Applying Channel Attention effectively compensated for the performance loss introduced by lightweight convolutions.
 - The **Depthwise + Skip Channel Attention + FFT** architecture achieved the strongest lightweight performance with **28.40 dB PSNR** and **0.9645 SSIM** on RESIDE-6K.
+
+---
+
+# Pre-trained Weights
+
+The repository includes the best-performing **Channel Attention U-Net** checkpoints trained using **SSIM Loss**.
+
+These checkpoints are available from the **GitHub Releases** section of this repository.
+
+| Checkpoint | Dataset | Loss |
+|------------|---------|------|
+| `channel_attention_unet_its_ssim.pth` | ITS | SSIM |
+| `channel_attention_unet_reside6k_ssim.pth` | RESIDE-6K | SSIM |
+
+After downloading, place the files inside the `weights/` directory.
+
+```text
+weights/
+├── channel_attention_unet_its_ssim.pth
+└── channel_attention_unet_reside6k_ssim.pth
+```
+
+These pretrained models can be evaluated directly using `eval.py` or used for inference with `test.py`.
 
 ---
 
 # Qualitative Results
 
-The repository includes scripts for generating side-by-side visual comparisons.
+The repository includes scripts for generating qualitative comparisons between hazy inputs, dehazed outputs, and corresponding ground-truth images.
 
 ```
-Hazy Input | Model Output | Ground Truth
+Hazy Input | Dehazed Output | Ground Truth
 ```
 
 <img width="697" height="231" alt="Sample Result" src="https://github.com/user-attachments/assets/d36cf4dd-b1fa-4c6f-b8e9-e34936f741d7" />
-
-**Left:** Hazy Image
-
-**Center:** Dehazed Output
-
-**Right:** Ground Truth
 
 ---
 
@@ -194,11 +210,10 @@ Clone the repository.
 
 ```bash
 git clone https://github.com/JaidityaSinha/image-dehazing.git
-
 cd image-dehazing
 ```
 
-Install the required packages.
+Install the required dependencies.
 
 ```bash
 pip install -r requirements.txt
@@ -208,19 +223,17 @@ pip install -r requirements.txt
 
 # Training
 
-Train a selected architecture using
+Configure the dataset paths and model settings in `config.py`, then train using
 
 ```bash
 python train.py
 ```
 
-Dataset paths, model selection, and training parameters can be configured through `config.py`.
-
 ---
 
 # Evaluation
 
-Evaluate a trained checkpoint using
+Evaluate a pretrained model using
 
 ```bash
 python eval.py
@@ -233,7 +246,7 @@ The evaluation reports:
 
 ---
 
-# Technologies
+# Technologies Used
 
 - Python
 - PyTorch
@@ -247,19 +260,19 @@ The evaluation reports:
 
 # Future Work
 
-- Vision Transformer-based dehazing
-- Physics-informed image restoration
-- Real-world haze benchmarks
+- Vision Transformer-based image dehazing
+- Physics-informed restoration models
+- Real-world haze benchmark evaluation
 - Model pruning and quantization
 - Knowledge distillation
-- ONNX/TensorRT deployment
-- Real-time edge inference
+- ONNX and TensorRT deployment
+- Real-time edge-device inference
 
 ---
 
 # Acknowledgements
 
-This work was completed during the **Summer Internship in Deep Learning and Computer Vision**.
+This project was completed during the **Summer Internship in Deep Learning and Computer Vision**.
 
 **Supervisor**
 
@@ -273,6 +286,6 @@ IDEAS – Institute of Data Engineering, Analytics and Science Foundation
 
 # License
 
-This repository is released for **academic and research purposes**.
+This project is released for **academic and research purposes**.
 
-If you use this work in your research, please consider citing the accompanying internship report.
+If you find this repository useful in your research or projects, please consider citing the accompanying internship report.
